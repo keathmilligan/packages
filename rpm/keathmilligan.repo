@@ -1,6 +1,0 @@
-[keathmilligan]
-name=keathmilligan packages
-baseurl=https://packages.keathmilligan.dev/rpm/$basearch/
-enabled=1
-gpgcheck=1
-gpgkey=https://packages.keathmilligan.dev/gpg.key
