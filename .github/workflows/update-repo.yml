@@ -50,12 +50,12 @@ jobs:
         run: |
           mkdir -p apt/conf
           cat > apt/conf/distributions << EOF
-          Origin: keathmilligan
-          Label: keathmilligan
+          Origin: ${{ vars.REPO_LABEL }}
+          Label: ${{ vars.REPO_LABEL }}
           Codename: stable
           Architectures: amd64 arm64
           Components: main
-          Description: keathmilligan package repository
+          Description: ${{ vars.REPO_LABEL }} package repository
           SignWith: $GPG_KEY_ID
           EOF
 
@@ -75,6 +75,24 @@ jobs:
               reprepro -b apt remove stable "${PROJECT}=${ver}" || true
             fi
           done
+
+      - name: Regenerate index.html
+        run: |
+          cat > index.html << EOF
+          <!DOCTYPE html>
+          <html>
+          <head><title>${{ vars.PACKAGES_DOMAIN }}</title></head>
+          <body>
+          <h1>Package Repositories</h1>
+          <p>Self-hosted apt, rpm, and apk package repositories.</p>
+          <ul>
+            <li><a href="/apt/">apt repository</a></li>
+            <li><a href="/rpm/">rpm repository</a></li>
+            <li><a href="/apk/">apk repository</a></li>
+          </ul>
+          </body>
+          </html>
+          EOF
 
       - name: Commit and push
         run: |
@@ -150,6 +168,35 @@ jobs:
             gpg --batch --yes --detach-sign --armor \
               "rpm/${arch}/repodata/repomd.xml"
           done
+
+      - name: Regenerate rpm repo config
+        run: |
+          cat > rpm/${{ vars.REPO_LABEL }}.repo << EOF
+          [${{ vars.REPO_LABEL }}]
+          name=${{ vars.REPO_LABEL }} packages
+          baseurl=https://${{ vars.PACKAGES_DOMAIN }}/rpm/\$basearch/
+          enabled=1
+          gpgcheck=1
+          gpgkey=https://${{ vars.PACKAGES_DOMAIN }}/gpg.key
+          EOF
+
+      - name: Regenerate index.html
+        run: |
+          cat > index.html << EOF
+          <!DOCTYPE html>
+          <html>
+          <head><title>${{ vars.PACKAGES_DOMAIN }}</title></head>
+          <body>
+          <h1>Package Repositories</h1>
+          <p>Self-hosted apt, rpm, and apk package repositories.</p>
+          <ul>
+            <li><a href="/apt/">apt repository</a></li>
+            <li><a href="/rpm/">rpm repository</a></li>
+            <li><a href="/apk/">apk repository</a></li>
+          </ul>
+          </body>
+          </html>
+          EOF
 
       - name: Prune old versions
         run: |
