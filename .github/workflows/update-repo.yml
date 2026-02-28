@@ -1,0 +1,173 @@
+name: Update Package Repositories
+
+on:
+  repository_dispatch:
+    types: [update-apt, update-rpm]
+
+permissions:
+  contents: write
+
+env:
+  MAX_VERSIONS: 5
+
+jobs:
+  update-apt:
+    if: github.event.action == 'update-apt'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout gh-pages
+        uses: actions/checkout@v4
+        with:
+          ref: gh-pages
+
+      - name: Install reprepro
+        run: sudo apt-get install -y reprepro
+
+      - name: Import GPG key
+        env:
+          PKG_GPG_PRIVATE_KEY: ${{ secrets.PKG_GPG_PRIVATE_KEY }}
+          PKG_GPG_PASSPHRASE: ${{ secrets.PKG_GPG_PASSPHRASE }}
+        run: |
+          echo "$PKG_GPG_PRIVATE_KEY" | gpg --batch --import
+          GPG_KEY_ID=$(gpg --list-secret-keys --keyid-format long | grep sec | awk '{print $2}' | cut -d'/' -f2)
+          echo "GPG_KEY_ID=$GPG_KEY_ID" >> "$GITHUB_ENV"
+
+      - name: Download deb packages from release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          PROJECT="${{ github.event.client_payload.project }}"
+          VERSION="${{ github.event.client_payload.version }}"
+          REPO="${{ github.event.client_payload.repo }}"
+
+          mkdir -p incoming
+          gh release download "v${VERSION}" \
+            --repo "$REPO" \
+            --pattern "*.deb" \
+            --dir incoming/
+
+      - name: Configure reprepro
+        run: |
+          mkdir -p apt/conf
+          cat > apt/conf/distributions << EOF
+          Origin: keathmilligan
+          Label: keathmilligan
+          Codename: stable
+          Architectures: amd64 arm64
+          Components: main
+          Description: keathmilligan package repository
+          SignWith: $GPG_KEY_ID
+          EOF
+
+      - name: Add packages to repository
+        run: |
+          for deb in incoming/*.deb; do
+            reprepro -b apt includedeb stable "$deb"
+          done
+
+      - name: Prune old versions
+        run: |
+          PROJECT="${{ github.event.client_payload.project }}"
+          # List versions and keep only the latest MAX_VERSIONS
+          reprepro -b apt list stable "$PROJECT" | tail -n +$((MAX_VERSIONS + 1)) | while read -r line; do
+            ver=$(echo "$line" | awk '{print $2}')
+            if [ -n "$ver" ]; then
+              reprepro -b apt remove stable "${PROJECT}=${ver}" || true
+            fi
+          done
+
+      - name: Commit and push
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "Update apt: ${{ github.event.client_payload.project }} ${{ github.event.client_payload.version }}" || echo "No changes"
+          git push
+
+  update-rpm:
+    if: github.event.action == 'update-rpm'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout gh-pages
+        uses: actions/checkout@v4
+        with:
+          ref: gh-pages
+
+      - name: Install createrepo
+        run: sudo apt-get install -y createrepo-c
+
+      - name: Import GPG key
+        env:
+          PKG_GPG_PRIVATE_KEY: ${{ secrets.PKG_GPG_PRIVATE_KEY }}
+          PKG_GPG_PASSPHRASE: ${{ secrets.PKG_GPG_PASSPHRASE }}
+        run: |
+          echo "$PKG_GPG_PRIVATE_KEY" | gpg --batch --import
+          GPG_KEY_ID=$(gpg --list-secret-keys --keyid-format long | grep sec | awk '{print $2}' | cut -d'/' -f2)
+          echo "GPG_KEY_ID=$GPG_KEY_ID" >> "$GITHUB_ENV"
+
+      - name: Download rpm packages from release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          PROJECT="${{ github.event.client_payload.project }}"
+          VERSION="${{ github.event.client_payload.version }}"
+          REPO="${{ github.event.client_payload.repo }}"
+
+          mkdir -p incoming
+          gh release download "v${VERSION}" \
+            --repo "$REPO" \
+            --pattern "*.rpm" \
+            --dir incoming/
+
+      - name: Add packages to repository
+        run: |
+          for rpm_file in incoming/*.rpm; do
+            FILENAME=$(basename "$rpm_file")
+            if [[ "$FILENAME" == *"x86_64"* ]]; then
+              cp "$rpm_file" rpm/x86_64/
+            elif [[ "$FILENAME" == *"aarch64"* ]]; then
+              cp "$rpm_file" rpm/aarch64/
+            fi
+          done
+
+      - name: Sign RPM packages
+        env:
+          PKG_GPG_PASSPHRASE: ${{ secrets.PKG_GPG_PASSPHRASE }}
+        run: |
+          for rpm_file in rpm/x86_64/*.rpm rpm/aarch64/*.rpm; do
+            [ -f "$rpm_file" ] || continue
+            rpmsign --addsign --key-id "$GPG_KEY_ID" "$rpm_file" <<< "$PKG_GPG_PASSPHRASE" || true
+          done
+
+      - name: Regenerate repository metadata
+        run: |
+          createrepo_c --update rpm/x86_64/ || createrepo_c rpm/x86_64/
+          createrepo_c --update rpm/aarch64/ || createrepo_c rpm/aarch64/
+
+      - name: Sign repository metadata
+        run: |
+          for arch in x86_64 aarch64; do
+            gpg --batch --yes --detach-sign --armor \
+              "rpm/${arch}/repodata/repomd.xml"
+          done
+
+      - name: Prune old versions
+        run: |
+          PROJECT="${{ github.event.client_payload.project }}"
+          for arch in x86_64 aarch64; do
+            # Sort RPMs by version, keep only latest MAX_VERSIONS
+            ls -t "rpm/${arch}/${PROJECT}"*.rpm 2>/dev/null | tail -n +$((MAX_VERSIONS + 1)) | while read -r old; do
+              rm -f "$old"
+            done
+          done
+          # Regenerate metadata after pruning
+          createrepo_c --update rpm/x86_64/ || true
+          createrepo_c --update rpm/aarch64/ || true
+
+      - name: Commit and push
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "Update rpm: ${{ github.event.client_payload.project }} ${{ github.event.client_payload.version }}" || echo "No changes"
+          git push
