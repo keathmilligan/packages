@@ -2,7 +2,7 @@ name: Update Package Repositories
 
 on:
   repository_dispatch:
-    types: [update-apt, update-rpm, update-install-scripts]
+    types: [update-apt, update-rpm, update-install-scripts, update-badges]
 
 permissions:
   contents: write
@@ -252,4 +252,38 @@ jobs:
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add -A
           git commit -m "Update install scripts: ${PROJECT} ${VERSION}" || echo "No changes"
+          git push
+
+  update-badges:
+    if: github.event.action == 'update-badges'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout master
+        uses: actions/checkout@v4
+        with:
+          ref: master
+
+      - name: Download badge SVGs from release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          PROJECT="${{ github.event.client_payload.project }}"
+          VERSION="${{ github.event.client_payload.version }}"
+          REPO="${{ github.event.client_payload.repo }}"
+
+          mkdir -p "${PROJECT}/badges"
+          gh release download "v${VERSION}" \
+            --repo "$REPO" \
+            --pattern "*.svg" \
+            --dir "${PROJECT}/badges/" \
+            --clobber
+
+      - name: Commit and push
+        run: |
+          PROJECT="${{ github.event.client_payload.project }}"
+          VERSION="${{ github.event.client_payload.version }}"
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "Update badges: ${PROJECT} ${VERSION}" || echo "No changes"
           git push
