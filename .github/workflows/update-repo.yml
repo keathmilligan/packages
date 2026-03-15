@@ -15,10 +15,10 @@ jobs:
     if: github.event.action == 'update-apt'
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout master
+      - name: Checkout gh-pages
         uses: actions/checkout@v4
         with:
-          ref: master
+          ref: gh-pages
 
       - name: Install reprepro
         run: sudo apt-get install -y reprepro
@@ -106,10 +106,10 @@ jobs:
     if: github.event.action == 'update-rpm'
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout master
+      - name: Checkout gh-pages
         uses: actions/checkout@v4
         with:
-          ref: master
+          ref: gh-pages
 
       - name: Install createrepo
         run: sudo apt-get install -y createrepo-c
@@ -223,10 +223,10 @@ jobs:
     if: github.event.action == 'update-install-scripts'
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout master
+      - name: Checkout gh-pages
         uses: actions/checkout@v4
         with:
-          ref: master
+          ref: gh-pages
 
       - name: Download install scripts from release
         env:
@@ -258,10 +258,10 @@ jobs:
     if: github.event.action == 'update-badges'
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout master
+      - name: Checkout gh-pages
         uses: actions/checkout@v4
         with:
-          ref: master
+          ref: gh-pages
 
       - name: Generate badge SVGs from shields.io
         run: |
