@@ -263,20 +263,35 @@ jobs:
         with:
           ref: master
 
-      - name: Download badge SVGs from release
-        env:
-          GH_TOKEN: ${{ github.token }}
+      - name: Generate badge SVGs from shields.io
         run: |
           PROJECT="${{ github.event.client_payload.project }}"
           VERSION="${{ github.event.client_payload.version }}"
-          REPO="${{ github.event.client_payload.repo }}"
 
           mkdir -p "${PROJECT}/badges"
-          gh release download "v${VERSION}" \
-            --repo "$REPO" \
-            --pattern "*.svg" \
-            --dir "${PROJECT}/badges/" \
-            --clobber
+
+          fetch_badge() {
+            local filename="$1"
+            local label="$2"
+            local message="$3"
+            local color="${4:-4c1}"
+            local enc_label enc_message
+            enc_label=$(printf '%s' "$label"   | python3 -c "import sys,urllib.parse; print(urllib.parse.quote(sys.stdin.read(), safe=''))")
+            enc_message=$(printf '%s' "$message" | python3 -c "import sys,urllib.parse; print(urllib.parse.quote(sys.stdin.read(), safe=''))")
+            curl -fsSL \
+              "https://img.shields.io/badge/${enc_label}-${enc_message}-${color}" \
+              -o "${PROJECT}/badges/${filename}.svg"
+          }
+
+          # Iterate over the channels JSON array from the dispatch payload
+          echo '${{ github.event.client_payload.channels }}' | \
+            jq -r '.[] | "\(.file)\t\(.label)"' | \
+            while IFS=$'\t' read -r file label; do
+              fetch_badge "$file" "$label" "v${VERSION}"
+            done
+
+          echo "Generated badges:"
+          ls -la "${PROJECT}/badges/"
 
       - name: Commit and push
         run: |
