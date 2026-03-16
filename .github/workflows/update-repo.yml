@@ -3,6 +3,15 @@ name: Update Package Repositories
 on:
   repository_dispatch:
     types: [update-apt, update-rpm, update-install-scripts, update-badges]
+  workflow_dispatch:
+    inputs:
+      job:
+        description: 'Job to run (init-apt)'
+        required: true
+        default: 'init-apt'
+        type: choice
+        options:
+          - init-apt
 
 permissions:
   contents: write
@@ -31,6 +40,9 @@ jobs:
           echo "$PKG_GPG_PRIVATE_KEY" | gpg --batch --import
           GPG_KEY_ID=$(gpg --list-secret-keys --keyid-format long | grep sec | awk '{print $2}' | cut -d'/' -f2)
           echo "GPG_KEY_ID=$GPG_KEY_ID" >> "$GITHUB_ENV"
+
+      - name: Export GPG public key
+        run: gpg --armor --export "$GPG_KEY_ID" > gpg.key
 
       - name: Download deb packages from release
         env:
@@ -61,9 +73,15 @@ jobs:
 
       - name: Add packages to repository
         run: |
-          for deb in incoming/*.deb; do
-            reprepro -b apt includedeb stable "$deb"
-          done
+          shopt -s nullglob
+          debs=(incoming/*.deb)
+          if [ ${#debs[@]} -gt 0 ]; then
+            for deb in "${debs[@]}"; do
+              reprepro -b apt includedeb stable "$deb"
+            done
+          else
+            reprepro -b apt export stable
+          fi
 
       - name: Prune old versions
         run: |
@@ -100,6 +118,54 @@ jobs:
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add -A
           git commit -m "Update apt: ${{ github.event.client_payload.project }} ${{ github.event.client_payload.version }}" || echo "No changes"
+          git push
+
+  init-apt:
+    if: github.event_name == 'workflow_dispatch' && inputs.job == 'init-apt'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout master
+        uses: actions/checkout@v4
+        with:
+          ref: master
+
+      - name: Install reprepro
+        run: sudo apt-get install -y reprepro
+
+      - name: Import GPG key
+        env:
+          PKG_GPG_PRIVATE_KEY: ${{ secrets.PKG_GPG_PRIVATE_KEY }}
+          PKG_GPG_PASSPHRASE: ${{ secrets.PKG_GPG_PASSPHRASE }}
+        run: |
+          echo "$PKG_GPG_PRIVATE_KEY" | gpg --batch --import
+          GPG_KEY_ID=$(gpg --list-secret-keys --keyid-format long | grep sec | awk '{print $2}' | cut -d'/' -f2)
+          echo "GPG_KEY_ID=$GPG_KEY_ID" >> "$GITHUB_ENV"
+
+      - name: Export GPG public key
+        run: gpg --armor --export "$GPG_KEY_ID" > gpg.key
+
+      - name: Configure reprepro
+        run: |
+          mkdir -p apt/conf
+          cat > apt/conf/distributions << EOF
+          Origin: ${{ vars.REPO_LABEL }}
+          Label: ${{ vars.REPO_LABEL }}
+          Codename: stable
+          Architectures: amd64 arm64
+          Components: main
+          Description: ${{ vars.REPO_LABEL }} package repository
+          SignWith: $GPG_KEY_ID
+          EOF
+
+      - name: Bootstrap apt repository metadata
+        run: reprepro -b apt export stable
+
+      - name: Commit and push
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "Bootstrap apt repository" || echo "No changes"
           git push
 
   update-rpm:
