@@ -286,34 +286,46 @@ jobs:
               -o "${PROJECT}/badges/${filename}.svg"
           }
 
-          # Fetch the list of release asset names once and cache it.
-          RELEASE_ASSETS=$(gh api "repos/${REPO}/releases/tags/v${VERSION}" \
-            --jq '[.assets[].name]' 2>/dev/null || echo "[]")
-
-          # Returns 0 (true) if any release asset name matches the given glob pattern.
-          asset_exists() {
-            local pattern="$1"
-            echo "$RELEASE_ASSETS" | \
-              jq -e --arg p "$pattern" \
-                'any(.[]; . == $p or test("^" + ($p | gsub("\\*"; ".*")) + "$"))' \
-              > /dev/null 2>&1
-          }
-
-          # Iterate over the channels JSON array from the dispatch payload.
-          # Each entry has .file, .label, and .asset (glob pattern or "" to skip check).
-          echo '${{ github.event.client_payload.channels }}' | \
-            jq -r '.[] | "\(.file)\t\(.label)\t\(.asset)"' | \
-            while IFS=$'\t' read -r file label asset; do
-              if [ -z "$asset" ] || asset_exists "$asset"; then
-                # Asset present (or no check required) — emit versioned badge.
-                fetch_badge "$file" "$label" "v${VERSION}"
-              else
-                # Asset absent — emit an empty "no release" badge so the SVG
-                # is present but neutral rather than a broken image link.
-                echo "No release asset matching '${asset}' found for channel '${file}'; writing empty badge."
+          # When version is empty there is no release yet — generate all
+          # badges as gray "no release" placeholders so README links are
+          # never broken.
+          if [ -z "$VERSION" ]; then
+            echo "No version provided; generating 'no release' placeholder badges for all channels."
+            echo '${{ github.event.client_payload.channels }}' | \
+              jq -r '.[] | "\(.file)\t\(.label)"' | \
+              while IFS=$'\t' read -r file label; do
                 fetch_badge "$file" "$label" "no release" "lightgrey"
-              fi
-            done
+              done
+          else
+            # Fetch the list of release asset names once and cache it.
+            RELEASE_ASSETS=$(gh api "repos/${REPO}/releases/tags/v${VERSION}" \
+              --jq '[.assets[].name]' 2>/dev/null || echo "[]")
+
+            # Returns 0 (true) if any release asset name matches the given glob pattern.
+            asset_exists() {
+              local pattern="$1"
+              echo "$RELEASE_ASSETS" | \
+                jq -e --arg p "$pattern" \
+                  'any(.[]; . == $p or test("^" + ($p | gsub("\\*"; ".*")) + "$"))' \
+                > /dev/null 2>&1
+            }
+
+            # Iterate over the channels JSON array from the dispatch payload.
+            # Each entry has .file, .label, and .asset (glob pattern or "" to skip check).
+            echo '${{ github.event.client_payload.channels }}' | \
+              jq -r '.[] | "\(.file)\t\(.label)\t\(.asset)"' | \
+              while IFS=$'\t' read -r file label asset; do
+                if [ -z "$asset" ] || asset_exists "$asset"; then
+                  # Asset present (or no check required) — emit versioned badge.
+                  fetch_badge "$file" "$label" "v${VERSION}"
+                else
+                  # Asset absent — emit an empty "no release" badge so the SVG
+                  # is present but neutral rather than a broken image link.
+                  echo "No release asset matching '${asset}' found for channel '${file}'; writing empty badge."
+                  fetch_badge "$file" "$label" "no release" "lightgrey"
+                fi
+              done
+          fi
 
           echo "Generated badges:"
           ls -la "${PROJECT}/badges/"
@@ -325,5 +337,9 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add -A
-          git commit -m "Update badges: ${PROJECT} ${VERSION}" || echo "No changes"
+          if [ -n "$VERSION" ]; then
+            git commit -m "Update badges: ${PROJECT} ${VERSION}" || echo "No changes"
+          else
+            git commit -m "Initialize badges: ${PROJECT} (no release)" || echo "No changes"
+          fi
           git push
