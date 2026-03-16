@@ -264,9 +264,12 @@ jobs:
           ref: master
 
       - name: Generate badge SVGs from shields.io
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
           PROJECT="${{ github.event.client_payload.project }}"
           VERSION="${{ github.event.client_payload.version }}"
+          REPO="${{ github.event.client_payload.repo }}"
 
           mkdir -p "${PROJECT}/badges"
 
@@ -283,11 +286,33 @@ jobs:
               -o "${PROJECT}/badges/${filename}.svg"
           }
 
-          # Iterate over the channels JSON array from the dispatch payload
+          # Fetch the list of release asset names once and cache it.
+          RELEASE_ASSETS=$(gh api "repos/${REPO}/releases/tags/v${VERSION}" \
+            --jq '[.assets[].name]' 2>/dev/null || echo "[]")
+
+          # Returns 0 (true) if any release asset name matches the given glob pattern.
+          asset_exists() {
+            local pattern="$1"
+            echo "$RELEASE_ASSETS" | \
+              jq -e --arg p "$pattern" \
+                'any(.[]; . == $p or test("^" + ($p | gsub("\\*"; ".*")) + "$"))' \
+              > /dev/null 2>&1
+          }
+
+          # Iterate over the channels JSON array from the dispatch payload.
+          # Each entry has .file, .label, and .asset (glob pattern or "" to skip check).
           echo '${{ github.event.client_payload.channels }}' | \
-            jq -r '.[] | "\(.file)\t\(.label)"' | \
-            while IFS=$'\t' read -r file label; do
-              fetch_badge "$file" "$label" "v${VERSION}"
+            jq -r '.[] | "\(.file)\t\(.label)\t\(.asset)"' | \
+            while IFS=$'\t' read -r file label asset; do
+              if [ -z "$asset" ] || asset_exists "$asset"; then
+                # Asset present (or no check required) — emit versioned badge.
+                fetch_badge "$file" "$label" "v${VERSION}"
+              else
+                # Asset absent — emit an empty "no release" badge so the SVG
+                # is present but neutral rather than a broken image link.
+                echo "No release asset matching '${asset}' found for channel '${file}'; writing empty badge."
+                fetch_badge "$file" "$label" "no release" "lightgrey"
+              fi
             done
 
           echo "Generated badges:"
