@@ -38,13 +38,20 @@ jobs:
           PKG_GPG_PASSPHRASE: ${{ secrets.PKG_GPG_PASSPHRASE }}
         run: |
           mkdir -p ~/.gnupg && chmod 700 ~/.gnupg
-          echo "allow-loopback-pinentry" > ~/.gnupg/gpg-agent.conf
+          printf 'allow-loopback-pinentry\ndefault-cache-ttl 0\nmax-cache-ttl 0\n' > ~/.gnupg/gpg-agent.conf
+          gpgconf --reload gpg-agent
+          # Import key and extract ID
           echo "$PKG_GPG_PRIVATE_KEY" | gpg --batch --import
           GPG_KEY_ID=$(gpg --list-secret-keys --keyid-format long | grep sec | awk '{print $2}' | cut -d'/' -f2)
           echo "GPG_KEY_ID=$GPG_KEY_ID" >> "$GITHUB_ENV"
-          # Strip passphrase so reprepro can sign without a TTY
+          # Export to a fresh GNUPGHOME without passphrase protection
+          mkdir -p /tmp/gnupg-tmp && chmod 700 /tmp/gnupg-tmp
+          printf 'allow-loopback-pinentry\n' > /tmp/gnupg-tmp/gpg-agent.conf
           gpg --batch --pinentry-mode loopback --passphrase "$PKG_GPG_PASSPHRASE" \
-            --quick-change-passphrase "$GPG_KEY_ID"
+            --export-secret-keys "$GPG_KEY_ID" \
+            | GNUPGHOME=/tmp/gnupg-tmp gpg --batch --passphrase '' --pinentry-mode loopback --import
+          # Replace the main keyring with the passphrase-free one
+          cp -a /tmp/gnupg-tmp/. ~/.gnupg/
 
       - name: Export GPG public key
         run: gpg --armor --export "$GPG_KEY_ID" > gpg.key
@@ -143,13 +150,18 @@ jobs:
           PKG_GPG_PASSPHRASE: ${{ secrets.PKG_GPG_PASSPHRASE }}
         run: |
           mkdir -p ~/.gnupg && chmod 700 ~/.gnupg
-          echo "allow-loopback-pinentry" > ~/.gnupg/gpg-agent.conf
+          printf 'allow-loopback-pinentry\ndefault-cache-ttl 0\nmax-cache-ttl 0\n' > ~/.gnupg/gpg-agent.conf
+          gpgconf --reload gpg-agent
           echo "$PKG_GPG_PRIVATE_KEY" | gpg --batch --import
           GPG_KEY_ID=$(gpg --list-secret-keys --keyid-format long | grep sec | awk '{print $2}' | cut -d'/' -f2)
           echo "GPG_KEY_ID=$GPG_KEY_ID" >> "$GITHUB_ENV"
-          # Strip passphrase so reprepro can sign without a TTY
+          # Export to a fresh GNUPGHOME without passphrase protection
+          mkdir -p /tmp/gnupg-tmp && chmod 700 /tmp/gnupg-tmp
+          printf 'allow-loopback-pinentry\n' > /tmp/gnupg-tmp/gpg-agent.conf
           gpg --batch --pinentry-mode loopback --passphrase "$PKG_GPG_PASSPHRASE" \
-            --quick-change-passphrase "$GPG_KEY_ID"
+            --export-secret-keys "$GPG_KEY_ID" \
+            | GNUPGHOME=/tmp/gnupg-tmp gpg --batch --passphrase '' --pinentry-mode loopback --import
+          cp -a /tmp/gnupg-tmp/. ~/.gnupg/
 
       - name: Export GPG public key
         run: gpg --armor --export "$GPG_KEY_ID" > gpg.key
@@ -196,13 +208,18 @@ jobs:
           PKG_GPG_PASSPHRASE: ${{ secrets.PKG_GPG_PASSPHRASE }}
         run: |
           mkdir -p ~/.gnupg && chmod 700 ~/.gnupg
-          echo "allow-loopback-pinentry" > ~/.gnupg/gpg-agent.conf
+          printf 'allow-loopback-pinentry\ndefault-cache-ttl 0\nmax-cache-ttl 0\n' > ~/.gnupg/gpg-agent.conf
+          gpgconf --reload gpg-agent
           echo "$PKG_GPG_PRIVATE_KEY" | gpg --batch --import
           GPG_KEY_ID=$(gpg --list-secret-keys --keyid-format long | grep sec | awk '{print $2}' | cut -d'/' -f2)
           echo "GPG_KEY_ID=$GPG_KEY_ID" >> "$GITHUB_ENV"
-          # Strip passphrase so signing tools work without a TTY
+          # Export to a fresh GNUPGHOME without passphrase protection
+          mkdir -p /tmp/gnupg-tmp && chmod 700 /tmp/gnupg-tmp
+          printf 'allow-loopback-pinentry\n' > /tmp/gnupg-tmp/gpg-agent.conf
           gpg --batch --pinentry-mode loopback --passphrase "$PKG_GPG_PASSPHRASE" \
-            --quick-change-passphrase "$GPG_KEY_ID"
+            --export-secret-keys "$GPG_KEY_ID" \
+            | GNUPGHOME=/tmp/gnupg-tmp gpg --batch --passphrase '' --pinentry-mode loopback --import
+          cp -a /tmp/gnupg-tmp/. ~/.gnupg/
 
       - name: Download rpm packages from release
         env:
