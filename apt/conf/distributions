@@ -1,0 +1,7 @@
+Origin: keathmilligan
+Label: keathmilligan
+Codename: stable
+Architectures: amd64 arm64
+Components: main
+Description: keathmilligan package repository
+SignWith: D80E4B4E34BA00E2
