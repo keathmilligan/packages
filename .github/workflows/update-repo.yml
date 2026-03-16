@@ -38,8 +38,9 @@ jobs:
           PKG_GPG_PASSPHRASE: ${{ secrets.PKG_GPG_PASSPHRASE }}
         run: |
           mkdir -p ~/.gnupg && chmod 700 ~/.gnupg
-          printf 'allow-loopback-pinentry\ndefault-cache-ttl 86400\nmax-cache-ttl 86400\n' > ~/.gnupg/gpg-agent.conf
+          printf 'allow-loopback-pinentry\nallow-preset-passphrase\ndefault-cache-ttl 86400\nmax-cache-ttl 86400\n' > ~/.gnupg/gpg-agent.conf
           gpgconf --kill gpg-agent
+          gpg-agent --daemon --homedir ~/.gnupg
           echo "$PKG_GPG_PRIVATE_KEY" | gpg --batch --import
           GPG_KEY_ID=$(gpg --list-secret-keys --keyid-format long | grep sec | awk '{print $2}' | cut -d'/' -f2)
           echo "GPG_KEY_ID=$GPG_KEY_ID" >> "$GITHUB_ENV"
@@ -148,8 +149,9 @@ jobs:
           PKG_GPG_PASSPHRASE: ${{ secrets.PKG_GPG_PASSPHRASE }}
         run: |
           mkdir -p ~/.gnupg && chmod 700 ~/.gnupg
-          printf 'allow-loopback-pinentry\ndefault-cache-ttl 86400\nmax-cache-ttl 86400\n' > ~/.gnupg/gpg-agent.conf
+          printf 'allow-loopback-pinentry\nallow-preset-passphrase\ndefault-cache-ttl 86400\nmax-cache-ttl 86400\n' > ~/.gnupg/gpg-agent.conf
           gpgconf --kill gpg-agent
+          gpg-agent --daemon --homedir ~/.gnupg
           echo "$PKG_GPG_PRIVATE_KEY" | gpg --batch --import
           GPG_KEY_ID=$(gpg --list-secret-keys --keyid-format long | grep sec | awk '{print $2}' | cut -d'/' -f2)
           echo "GPG_KEY_ID=$GPG_KEY_ID" >> "$GITHUB_ENV"
@@ -205,8 +207,9 @@ jobs:
           PKG_GPG_PASSPHRASE: ${{ secrets.PKG_GPG_PASSPHRASE }}
         run: |
           mkdir -p ~/.gnupg && chmod 700 ~/.gnupg
-          printf 'allow-loopback-pinentry\ndefault-cache-ttl 86400\nmax-cache-ttl 86400\n' > ~/.gnupg/gpg-agent.conf
+          printf 'allow-loopback-pinentry\nallow-preset-passphrase\ndefault-cache-ttl 86400\nmax-cache-ttl 86400\n' > ~/.gnupg/gpg-agent.conf
           gpgconf --kill gpg-agent
+          gpg-agent --daemon --homedir ~/.gnupg
           echo "$PKG_GPG_PRIVATE_KEY" | gpg --batch --import
           GPG_KEY_ID=$(gpg --list-secret-keys --keyid-format long | grep sec | awk '{print $2}' | cut -d'/' -f2)
           echo "GPG_KEY_ID=$GPG_KEY_ID" >> "$GITHUB_ENV"
