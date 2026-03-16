@@ -37,9 +37,16 @@ jobs:
           PKG_GPG_PRIVATE_KEY: ${{ secrets.PKG_GPG_PRIVATE_KEY }}
           PKG_GPG_PASSPHRASE: ${{ secrets.PKG_GPG_PASSPHRASE }}
         run: |
+          mkdir -p ~/.gnupg
+          chmod 700 ~/.gnupg
+          echo "allow-loopback-pinentry" >> ~/.gnupg/gpg-agent.conf
+          gpgconf --kill gpg-agent
           echo "$PKG_GPG_PRIVATE_KEY" | gpg --batch --import
           GPG_KEY_ID=$(gpg --list-secret-keys --keyid-format long | grep sec | awk '{print $2}' | cut -d'/' -f2)
           echo "GPG_KEY_ID=$GPG_KEY_ID" >> "$GITHUB_ENV"
+          # Cache passphrase in agent via loopback so reprepro can sign without a TTY
+          KEY_GRIP=$(gpg --list-secret-keys --with-keygrip "$GPG_KEY_ID" | awk '/Keygrip/{print $3; exit}')
+          echo "$PKG_GPG_PASSPHRASE" | /usr/lib/gnupg/gpg-preset-passphrase --preset "$KEY_GRIP"
 
       - name: Export GPG public key
         run: gpg --armor --export "$GPG_KEY_ID" > gpg.key
@@ -137,9 +144,16 @@ jobs:
           PKG_GPG_PRIVATE_KEY: ${{ secrets.PKG_GPG_PRIVATE_KEY }}
           PKG_GPG_PASSPHRASE: ${{ secrets.PKG_GPG_PASSPHRASE }}
         run: |
+          mkdir -p ~/.gnupg
+          chmod 700 ~/.gnupg
+          echo "allow-loopback-pinentry" >> ~/.gnupg/gpg-agent.conf
+          gpgconf --kill gpg-agent
           echo "$PKG_GPG_PRIVATE_KEY" | gpg --batch --import
           GPG_KEY_ID=$(gpg --list-secret-keys --keyid-format long | grep sec | awk '{print $2}' | cut -d'/' -f2)
           echo "GPG_KEY_ID=$GPG_KEY_ID" >> "$GITHUB_ENV"
+          # Cache passphrase in agent via loopback so reprepro can sign without a TTY
+          KEY_GRIP=$(gpg --list-secret-keys --with-keygrip "$GPG_KEY_ID" | awk '/Keygrip/{print $3; exit}')
+          echo "$PKG_GPG_PASSPHRASE" | /usr/lib/gnupg/gpg-preset-passphrase --preset "$KEY_GRIP"
 
       - name: Export GPG public key
         run: gpg --armor --export "$GPG_KEY_ID" > gpg.key
@@ -185,9 +199,16 @@ jobs:
           PKG_GPG_PRIVATE_KEY: ${{ secrets.PKG_GPG_PRIVATE_KEY }}
           PKG_GPG_PASSPHRASE: ${{ secrets.PKG_GPG_PASSPHRASE }}
         run: |
+          mkdir -p ~/.gnupg
+          chmod 700 ~/.gnupg
+          echo "allow-loopback-pinentry" >> ~/.gnupg/gpg-agent.conf
+          gpgconf --kill gpg-agent
           echo "$PKG_GPG_PRIVATE_KEY" | gpg --batch --import
           GPG_KEY_ID=$(gpg --list-secret-keys --keyid-format long | grep sec | awk '{print $2}' | cut -d'/' -f2)
           echo "GPG_KEY_ID=$GPG_KEY_ID" >> "$GITHUB_ENV"
+          # Cache passphrase in agent via loopback so signing tools work without a TTY
+          KEY_GRIP=$(gpg --list-secret-keys --with-keygrip "$GPG_KEY_ID" | awk '/Keygrip/{print $3; exit}')
+          echo "$PKG_GPG_PASSPHRASE" | /usr/lib/gnupg/gpg-preset-passphrase --preset "$KEY_GRIP"
 
       - name: Download rpm packages from release
         env:
