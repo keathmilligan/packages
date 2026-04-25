@@ -1,16 +1,16 @@
 Package: stunt
-Version: 0.3.0
+Version: 0.3.1
 Architecture: amd64
 Maintainer:  <>
-Installed-Size: 2273
+Installed-Size: 2249
 Homepage: https://github.com/keathmilligan/stunt
 Priority: optional
 Section: 
-Filename: pool/main/s/stunt/stunt_0.3.0_amd64.deb
-Size: 1098674
-SHA256: 121dba950bf5a381c29409e9b14bfe481db4cdc5322775964649951995f2ba08
-SHA1: 30940d9c9d671585094bb9b1c2cb7ca6520b9485
-MD5sum: 96f48253dd14d919f04159839a00c108
+Filename: pool/main/s/stunt/stunt_0.3.1_amd64.deb
+Size: 1090048
+SHA256: 7c823f207e901e957c983245aa5aa8dee84a447aba3489cf26c6f743467d5f99
+SHA1: 2f04a9dfc512791288c570e0d4da69d743797505
+MD5sum: 8515f5a72b8b07058449bfb4173c8d9f
 Description: STunT - Stupid Tunnel Tricks: A TUI for managing SSH tunnel connections
 
 Package: unfk
