@@ -128,7 +128,11 @@ jobs:
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add -A
           git commit -m "Update apt: ${{ github.event.client_payload.project }} ${{ github.event.client_payload.version }}" || echo "No changes"
-          git push
+          for attempt in 1 2 3 4 5; do
+            git push && break
+            echo "Push failed (attempt $attempt), pulling with rebase and retrying..."
+            git pull --rebase origin master
+          done
 
   init-apt:
     if: github.event_name == 'workflow_dispatch' && inputs.job == 'init-apt'
@@ -185,7 +189,11 @@ jobs:
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add -A
           git commit -m "Bootstrap apt repository" || echo "No changes"
-          git push
+          for attempt in 1 2 3 4 5; do
+            git push && break
+            echo "Push failed (attempt $attempt), pulling with rebase and retrying..."
+            git pull --rebase origin master
+          done
 
   update-rpm:
     if: github.event.action == 'update-rpm'
@@ -311,7 +319,11 @@ jobs:
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add -A
           git commit -m "Update rpm: ${{ github.event.client_payload.project }} ${{ github.event.client_payload.version }}" || echo "No changes"
-          git push
+          for attempt in 1 2 3 4 5; do
+            git push && break
+            echo "Push failed (attempt $attempt), pulling with rebase and retrying..."
+            git pull --rebase origin master
+          done
 
   update-install-scripts:
     if: github.event.action == 'update-install-scripts'
@@ -346,7 +358,11 @@ jobs:
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add -A
           git commit -m "Update install scripts: ${PROJECT} ${VERSION}" || echo "No changes"
-          git push
+          for attempt in 1 2 3 4 5; do
+            git push && break
+            echo "Push failed (attempt $attempt), pulling with rebase and retrying..."
+            git pull --rebase origin master
+          done
 
   update-badges:
     if: github.event.action == 'update-badges'
@@ -436,4 +452,8 @@ jobs:
           else
             git commit -m "Initialize badges: ${PROJECT} (no release)" || echo "No changes"
           fi
-          git push
+          for attempt in 1 2 3 4 5; do
+            git push && break
+            echo "Push failed (attempt $attempt), pulling with rebase and retrying..."
+            git pull --rebase origin master
+          done
