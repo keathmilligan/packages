@@ -4,44 +4,44 @@ Hash: SHA512
 Origin: keathmilligan
 Label: keathmilligan
 Codename: stable
-Date: Tue, 16 Jun 2026 22:42:18 UTC
+Date: Fri, 19 Jun 2026 03:59:16 UTC
 Architectures: amd64 arm64
 Components: main
 Description: keathmilligan package repository
 MD5Sum:
- 9e52ad31cdcb4ff8278132c331234515 950 main/binary-amd64/Packages
- 3f28bb610d9fa934c293a9baae4da4c6 550 main/binary-amd64/Packages.gz
+ 9b08566ea0dfbebc2884155684b2a631 1457 main/binary-amd64/Packages
+ 5cce1214973e107fd8778ea55eb4be17 745 main/binary-amd64/Packages.gz
  d2b9b8f9686b41356c0e986ae79d6699 125 main/binary-amd64/Release
- 80ffe51dc69f4af7ea09fb022d881921 950 main/binary-arm64/Packages
- b33b519af300504bd6c20febc49e6da3 550 main/binary-arm64/Packages.gz
+ 691d1732cc8ac0d506d848715d3f8713 1457 main/binary-arm64/Packages
+ e2323b68ff1414aa80bfc55b7aaf7dc9 742 main/binary-arm64/Packages.gz
  9b69aa75bab11af6814075bbf2f85d04 125 main/binary-arm64/Release
 SHA1:
- 836a411d79cb9ddc18aa907b734fcac8747a94b8 950 main/binary-amd64/Packages
- 5ec1508b9afccbc522ff419cb1092b9d6b0e6e7a 550 main/binary-amd64/Packages.gz
+ 5a349f8a3334e0f5047b7e6d973734d5580fede1 1457 main/binary-amd64/Packages
+ 4c96804cb503e5e3a15ed830385159c32c7132b7 745 main/binary-amd64/Packages.gz
  27585b6d7db98e54bc943a7c55ec4d8fb6786282 125 main/binary-amd64/Release
- 308534d533514237ec6bbcdddddfe61d49ba0990 950 main/binary-arm64/Packages
- 16a56bf6a103369f509672dd8fd5400f21ad5615 550 main/binary-arm64/Packages.gz
+ 20b8e4aa1adaf6f5e892badba309c959d681facf 1457 main/binary-arm64/Packages
+ 21e6833249491cab94a1d09fee5a6178554bfaa2 742 main/binary-arm64/Packages.gz
  38a0c16355ebb15d0db02b9cb9f9a3f7b070868f 125 main/binary-arm64/Release
 SHA256:
- 23eb2f9433cf824605a4ac10c12be57e53eca9e9eda8be1095ce13312f4cf9d9 950 main/binary-amd64/Packages
- be55292b4467276a549dc7ac3ea05ec0f5e276b17bb13fbed54ebc3b9586cc55 550 main/binary-amd64/Packages.gz
+ 36739d6fc0211dde48aca9eb9cc8a1bcd6775faaf8ccb3a2590f4f39d74efb0b 1457 main/binary-amd64/Packages
+ 7a1ab427e0eb401d293aa34e3ce895c7c99f34aab60c90dc35c51b2fad04f53d 745 main/binary-amd64/Packages.gz
  48a821cee9d7ddc957e2b0a19f60ba5398afb86d8be267af1901e4319d770959 125 main/binary-amd64/Release
- cc45aa4da371a8ac7dae9062cc919b3f35687859c4f983c26e7b956db907b89f 950 main/binary-arm64/Packages
- 2d7930c524a54f36c13fdb38ad588a91e65df13982e69641c0a14472e51e4c7b 550 main/binary-arm64/Packages.gz
+ 0b3826b018c3cafcb34f074043974979d4d7dae3097767ddab64f1b666f6121d 1457 main/binary-arm64/Packages
+ 6ced2132e19d8b75f12ae32bfd63f8e575f3ba47b2acff04acd71a0b979d30aa 742 main/binary-arm64/Packages.gz
  75a7485d3e1757fab3dc3717d6e77d69b407bc91d894334f210148e303f8378b 125 main/binary-arm64/Release
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCgAdFiEErwrJZFJYe8aPgn8u2A5LTjS6AOIFAmox0UoACgkQ2A5LTjS6
-AOJDTA/+NcLThegeN4exDTG5dzxcLRpcJ4/558kA4mpaP/FZ81RA3c/kVLBkeXKB
-SXym0bYFnz1WGPR3NRd9psQzi3qcuabeETj7zNG2qu7hTpTruQpnM9/YfLkhhdgf
-pbwHcVeZ6P/IuAELNocspuzcIw7oK2uvm+QdAyalhzkv2q5CcTVjDP6oWUEC8P81
-z2TCy66mGP+2AzqSaus+tu+ht07Xvhqh8yPIEQd93Xh32PVMVkFZJ3nL6LTj7Bhh
-D8v4xS8+iPXZbT6AgOMWqpAbdM2tfrf+o2WFDXZnIGzY763Ck0peYDITf7dN3Fdd
-Q2gGDSppjrqCBXMrNwvHHpX5Tt6c8aDqA5Lliv8w1n2AKtve7R2VR5CpcNRbdE0H
-ThPUAWS0/oU075UsQdPXjmGX8jQpUdC6BXlKNB55KLM5IQY2NXnKa7DZRbs9mD9F
-hIw07P9f/OX4wdU9qpjhZyLiRITWEZ2h5yEjOHP3gbqbaWfRHMhT0FjySpR4ez9z
-ZLOZWemFfEx5ImMWvPSSMmL+H20NHlrhGxsEfYRuVbsDEPiTbl1KpxqMQtsdNRlo
-YqFaFOjDj1g/D/VpXKcpOQYGLAQNlGAQ1gid7xMWqSqcJ/FjuCUx7na3srl6w4DU
-zTjYvsU8VhuC1Qoh2NIXemTvEEm8B6H5p3XagyWZSwiwzBP0mlw=
-=yoTm
+iQIzBAEBCgAdFiEErwrJZFJYe8aPgn8u2A5LTjS6AOIFAmo0vpQACgkQ2A5LTjS6
+AOIPEg//SXX0bLRJLlTkTHs7eRstxOKCl4q66uTlfOV+IygSzr9KulCu0ZYE9CrL
+ib+9Rz/o9Ta9Zt8CQ1NK1VCt6raGiR9v0KEBwss8w1Qr3zikx7s6nXvn/RLNLQWK
+9oG41ra1sriOKSaR85CJqlpi2akxpudbj1zb+S41h4UDxwjVJddWBEfBH4mcdmsU
+FW6iPb3ikLwm/74eQqH/y0YWLpJeYkk7gzj3TO5S8V2uRNAqjcxqN7/kH65cR9qw
+MWy05rwMAskkfXGWLPup1yqoWT41wKOma/h4+gJGpVffbH4QHnOf6Hok+eVtwgYR
+9hD8+pUDv1a9n05Z/11262iAKK2zU2qbMMps41RFZEKWgciI0wfNjUbAQsVHmkTs
+ULiIWnAVv/AzYtyG8WttBlvziVpsjyvei2pMJeWI9HDgBaD220gulV4HO0Ld8AgD
+EacYV4y809dzneszW0x0NAVDF6xLu1UvikGKD1F1fgRY4eu9ETmO18SY+vw+wIK/
+tdTN2jaN3Qb95j7FJ1fEIvvX9o9RaoYxplYKClXUg+Mfa/GZecJ1XO1fmKzUjERs
+P+E/X8fVKTqrU/mLfB62w87VAEl3fZZPCmOlNhiUf8eim4nr3IlRG4Xke/Xlmu3y
+/PVZxDC9o0ujErZpvIUmfFBrjt+EN3jvOBlBL5OCPXiOmrE9wvA=
+=puar
 -----END PGP SIGNATURE-----
