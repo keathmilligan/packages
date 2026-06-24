@@ -1,28 +1,28 @@
 Origin: keathmilligan
 Label: keathmilligan
 Codename: stable
-Date: Tue, 23 Jun 2026 13:42:54 UTC
+Date: Wed, 24 Jun 2026 13:50:35 UTC
 Architectures: amd64 arm64
 Components: main
 Description: keathmilligan package repository
 MD5Sum:
- 770b2cc57d56a73dee01737da7004a03 1457 main/binary-amd64/Packages
- 09b53c8f40a06531cfb61e01fb7e9b21 745 main/binary-amd64/Packages.gz
+ 0b2e95c03c971e2343ac0b2968b9cea3 1457 main/binary-amd64/Packages
+ 0605fa50c735b10d02a88c8b91c86a5a 745 main/binary-amd64/Packages.gz
  d2b9b8f9686b41356c0e986ae79d6699 125 main/binary-amd64/Release
- 3468679a410009654995e484a26c6a3b 1457 main/binary-arm64/Packages
- 92233beff9a4531d25d64352025b2d1a 743 main/binary-arm64/Packages.gz
+ d60bfce0e5116e3fdbc4bc2179bfd9e2 1457 main/binary-arm64/Packages
+ 2f8debdfd955e77ee1adf992564df105 740 main/binary-arm64/Packages.gz
  9b69aa75bab11af6814075bbf2f85d04 125 main/binary-arm64/Release
 SHA1:
- ba3303bc8203f8f2a5ecb84e32d335d56af7e4e7 1457 main/binary-amd64/Packages
- 1cea062e2bafd072d624ba69776945869c250925 745 main/binary-amd64/Packages.gz
+ 8d9281d04b9adec0645c8b83953155f6cbc0c586 1457 main/binary-amd64/Packages
+ 2323f6dea1a812cfdba33ab0b290485b63f9c0a2 745 main/binary-amd64/Packages.gz
  27585b6d7db98e54bc943a7c55ec4d8fb6786282 125 main/binary-amd64/Release
- 76630db4be7da6d37582e161a70d15364c373a00 1457 main/binary-arm64/Packages
- d053f3b98b45b00bde799796c84fbe061065216e 743 main/binary-arm64/Packages.gz
+ 1b7346b09d845089cef3b9a64801eb8c82074063 1457 main/binary-arm64/Packages
+ da5620e01e0b4f8fbc8b7532b807f84d710550f6 740 main/binary-arm64/Packages.gz
  38a0c16355ebb15d0db02b9cb9f9a3f7b070868f 125 main/binary-arm64/Release
 SHA256:
- 385a6704c6b909db10cf155b51e600c9b16de74eedd646ef6e9ee96a212a1a84 1457 main/binary-amd64/Packages
- 19ac4e834270a560c9b560981f9dc835e48efa5f78869e2302f011f52ceb5c8e 745 main/binary-amd64/Packages.gz
+ dfb7b2ecc80642e432c6de6a7ad6da85eec74426dc52857e6a26e6d071721d33 1457 main/binary-amd64/Packages
+ 744a992830d8779dc39445d1e06a637dfa46ad7a74b09079232b8f4f590ed8ad 745 main/binary-amd64/Packages.gz
  48a821cee9d7ddc957e2b0a19f60ba5398afb86d8be267af1901e4319d770959 125 main/binary-amd64/Release
- 28160faedd785984a38f0f9166d2eb867281c20939cd99c0305208953221f1fd 1457 main/binary-arm64/Packages
- ce6335a065026fef219df4fa096770f3af611f765dff7beab270c9e415bf9a8a 743 main/binary-arm64/Packages.gz
+ 8dcd086eba870d905000fbae5c943f1905937f4d9b8cf2ece1c68e009fb53d31 1457 main/binary-arm64/Packages
+ 249c4e2c9d3733600070f6d9a5db2251742346cda0c6687dcc2fc30088139a2e 740 main/binary-arm64/Packages.gz
  75a7485d3e1757fab3dc3717d6e77d69b407bc91d894334f210148e303f8378b 125 main/binary-arm64/Release

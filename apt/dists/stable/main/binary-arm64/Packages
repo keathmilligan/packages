@@ -1,16 +1,16 @@
 Package: gfm-hotview
-Version: 0.2.0
+Version: 0.2.1
 Architecture: arm64
 Maintainer:  <>
 Installed-Size: 16768
 Homepage: https://github.com/keathmilligan/gfm-hotview
 Priority: optional
 Section: utils
-Filename: pool/main/g/gfm-hotview/gfm-hotview_0.2.0_arm64.deb
-Size: 5940076
-SHA256: 8d5f20abd61abd4b9cccbc1d9f0e94457fa644dbadcb75d835d0d6ac169ef716
-SHA1: 150edbc96fcf11f39f85a76ec130438aa0a60819
-MD5sum: fa27c3fa453dd395fcd1ff50950f4ab4
+Filename: pool/main/g/gfm-hotview/gfm-hotview_0.2.1_arm64.deb
+Size: 5951964
+SHA256: f0c7ce363647600af4a17591217c40daf26eb6ba2934821539129d8cbb31be2a
+SHA1: 794e1368f7f6ea2515739ba34d8c4d86333c42da
+MD5sum: 752eb63380ef845fcee5260fb07c6e96
 Description: A lightweight, offline GitHub-Flavored Markdown file browser and viewer.
 
 Package: stunt
